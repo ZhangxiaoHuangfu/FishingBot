@@ -40,19 +40,33 @@ public class GUI extends Application
         final String STYLESHEET_PATH = "/Style.css";
 
         /* Nodes. */
+        //console label
         final Label lblConsole = new Label(Lang.EN_NODE_CONSOLE),
+                //scan speed label
                 lblSpeed = new Label(Lang.EN_LABEL_SPEED),
+                //splash sensitivity label
                 lblSensitivity = new Label(Lang.EN_LABEL_SENSITIVITY);
+        //todo
         final TextArea txaConsole = new TextArea();
+        // always on top toggle
         final ToggleButton tgbOnTop = new ToggleButton(Lang.EN_LABEL_ON_TOP),
+                //debug toggle
                 tgbDebug = new ToggleButton(Lang.EN_LABEL_DEBUG);
+        //todo
         final ImageView imgQuest = new ImageView(),
+              //todo
                 imgMouse = new ImageView();
+        //start button
         final Button btnStart = new Button(Lang.EN_NODE_START),
+                //stop button
                 btnStop = new Button(Lang.EN_NODE_STOP),
+                //calibarte button
                 btnCalibrate = new Button(Lang.EN_NODE_CALIBRATE, imgMouse);
+        //slider scan speed
         final Slider sldDelay = new Slider(),
+                //slider splash sensitivity
                 sldSensitivity = new Slider();
+        //help circle at the middle bottom
         final Circle cirFrame = new Circle(CIRCLE_FRAME_RADIUS);
 
         /* Panes. */

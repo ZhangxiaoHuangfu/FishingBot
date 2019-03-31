@@ -8,9 +8,10 @@ import view.GUI;
 
 import java.awt.*;
 import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.time.LocalTime;
+import java.util.*;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public final class Angler implements Runnable
@@ -72,7 +73,7 @@ public final class Angler implements Runnable
     private void fish()
     {
         fishing.set(true);
-        final int DELAY_VARIANCE = 5000, BASE_SLEEP = 2000;
+        final int DELAY_VARIANCE = 2000, BASE_SLEEP = 2000;
 
         Tools.sleep(BASE_SLEEP);
         while (!interrupted)
@@ -90,10 +91,13 @@ public final class Angler implements Runnable
             /* If a lure needs to be re-applied, use one. */
             if (lure.shouldApply()) lure.apply();
 
-            Tools.typeStr(Lang.EN_CAST_FISHING);
-            if (scan())
+            Tools.typeStr(Lang.CN_CAST_FISHING);
+            if (scan()) {
+                Point mourse = MouseInfo.getPointerInfo().getLocation();
+                Controller.sendMessage(String.format("mouse location x is %s,location y is %s", mourse.getX(), mourse.getY()));
                 Controller.sendMessage(reelIn() ? Lang.EN_MSG_FISH_CAUGHT
-                                                : Lang.EN_ERROR_SPLASH_MISSING);
+                        : Lang.EN_ERROR_SPLASH_MISSING);
+            }
             else
                 Controller.sendMessage(Lang.EN_ERROR_BOBBER_MISSING);
             /* Sleep for at least BASE_SLEEP plus an additional random amount. */
@@ -119,16 +123,17 @@ public final class Angler implements Runnable
                 WIDTH = Tools.USER_MAIN_DISPLAY.getWidth(), HEIGHT = Tools.USER_MAIN_DISPLAY.getHeight(),
                 Y_START = (int)(HEIGHT * HALF), Y_END = (int)(HEIGHT * (1 - RANGE_SCALE)),
                 X_START = (int)(WIDTH * RANGE_SCALE), X_END = (int)(WIDTH * (1 - RANGE_SCALE)),
-                X_PIX_SKIP = WIDTH / 42, Y_PIX_SKIP = HEIGHT / 72;
-
+                X_PIX_SKIP = 30, Y_PIX_SKIP = 37;
+//        Controller.sendMessage("X_PIX_SKIP = " + X_PIX_SKIP);
+//        Controller.sendMessage("Y_PIX_SKIP = " + Y_PIX_SKIP);
         /* Reset the mouse position so we don't accidentally hover over the bobber again. */
         Tools.bot.mouseMove(0, 0);
         /* For users with slower computers. Their GPU needs time to load the bobber in. */
         Tools.sleep(DELAY_TIME);
 
         /* Loop through the center portion of the user's screen. */
-        for (int y = Y_START; y < Y_END; y += Y_PIX_SKIP)
-            for (int x = X_START; x < X_END; x += X_PIX_SKIP)
+        for (int y = Y_START; y < Y_END  ; y += Y_PIX_SKIP)
+            for (int x = X_END; x > X_START ; x -= X_PIX_SKIP)
             {
                 if (interrupted) return false;
                 /* Move the mouse in hopes that we will be over the bobber. */
@@ -162,7 +167,10 @@ public final class Angler implements Runnable
 
         /* Determine how much blue there WAS at the start of this cycle. */
         final double ctrlBlue = Tools.avgBlueProximity(MOUSE_X, MOUSE_Y);
-
+        Controller.sendMessage("========================== : "+ctrlBlue);
+        java.util.List<Double> diffs = new ArrayList<>();
+        java.util.List<Double> diffs_diffs = new ArrayList<>();
+        boolean flag = true;
         /* As long as the in-game cast is still going, there's hope of catching the fish. */
         while (!interrupted && !Tools.timePassed(START_TS, GIVE_UP_TS))
         {
@@ -170,26 +178,73 @@ public final class Angler implements Runnable
             Tools.sleep(CPU_DELAY);
             /* Find the average blue where the mouse is */
             final double avgBlue = Tools.avgBlueProximity(MOUSE_X, MOUSE_Y);
-            final double diff = Math.abs(ctrlBlue - avgBlue);
-            if (Controller.debugMode.get())
-                Controller.sendMessage(Lang.EN_DEBUG_COLOR_THRESH.replaceFirst("%1",
-                        String.format("%.2f", diff))
-                        .replaceFirst("%2", String.format("%.2f", sensitivityProperty.get())));
+            final double diff = ctrlBlue - avgBlue;
+            Map<String, Double> map = new HashMap<>();
+            diffs.add(diff);
+            diffs_diffs.add(diff);
+            Collections.sort(diffs_diffs);
+            if (diffs.size() > 15) {
+                getE(diffs, map);
+                double e = map.get("min");
 
-            /* If the difference in blue changed enough, the bobber just splashed! */
-            if (Math.abs(ctrlBlue - avgBlue) >= sensitivityProperty.get())
-            {
-                /* Shift right click to loot the fish. */
-                Tools.bot.mouseMove(MOUSE_X, MOUSE_Y);
-                Tools.bot.keyPress(KeyEvent.VK_SHIFT);
-                Tools.bot.mousePress(InputEvent.BUTTON3_DOWN_MASK);
-                Tools.bot.mouseRelease(InputEvent.BUTTON3_DOWN_MASK);
-                Tools.bot.keyRelease(KeyEvent.VK_SHIFT);
-                return true;
+                if (Controller.debugMode.get()){
+                    Controller.sendMessage(String.valueOf(diff));
+                    Controller.sendMessage("e=======:  "+String.valueOf(e));
+                }
+
+                if (Math.abs(e) / Math.abs(diffs_diffs.get(0)-diffs_diffs.get(diffs_diffs.size()-1)) > 0.50) {
+                    Controller.sendMessage(String.valueOf(Math.abs(diffs_diffs.get(0)-diffs_diffs.get(diffs_diffs.size()-1))));
+                    Controller.sendMessage(String.valueOf(Math.abs(e)));
+                    Tools.sleep((long) scanSpeedProperty.get());
+                    /* Shift right click to loot the fish. */
+                    Tools.bot.mouseMove(MOUSE_X, MOUSE_Y);
+//                    Tools.bot.keyPress(KeyEvent.VK_SHIFT);
+                    Tools.bot.mousePress(InputEvent.BUTTON3_DOWN_MASK);
+                    Tools.bot.mouseRelease(InputEvent.BUTTON3_DOWN_MASK);
+//                    Tools.bot.keyRelease(KeyEvent.VK_SHIFT);
+                    return true;
+                }
+
             }
+
+
+
+
+
+
+
+//            if (Controller.debugMode.get())
+//                Controller.sendMessage(Lang.EN_DEBUG_COLOR_THRESH.replaceFirst("%1",
+//                        String.format("%.2f", diff))
+//                        .replaceFirst("%2", String.format("%.2f", sensitivityProperty.get())));
+//
+//            /* If the difference in blue changed enough, the bobber just splashed! */
+//            if (Math.abs(ctrlBlue - avgBlue) >= sensitivityProperty.get())
+//            {
+//                /* Shift right click to loot the fish. */
+//                Tools.bot.mouseMove(MOUSE_X, MOUSE_Y);
+//                Tools.bot.keyPress(KeyEvent.VK_SHIFT);
+//                Tools.bot.mousePress(InputEvent.BUTTON3_DOWN_MASK);
+//                Tools.bot.mouseRelease(InputEvent.BUTTON3_DOWN_MASK);
+//                Tools.bot.keyRelease(KeyEvent.VK_SHIFT);
+//                return true;
+//            }
         }
 
         return false;
+    }
+
+    private void getE(List<Double> diffs, Map<String, Double> map) {
+        map.clear();
+        for (int i = 6; i <=10 ; i++) {
+            double e = diffs.get(diffs.size() - 1) - diffs.get(diffs.size() - i);
+            if (map.get("min") == null) {
+                map.put("min", e);
+            } else if (e > map.get("min")) {
+                map.put("min", e);
+            }
+        }
+
     }
 
     /**
@@ -223,6 +278,8 @@ public final class Angler implements Runnable
         final BufferedImage ss = Tools.screenshot();
 
         final Point left = GUI.winSelect.getLeft(), right = GUI.winSelect.getRight();
+        Controller.sendMessage(left.toString());
+        Controller.sendMessage(right.toString());
         for (int y = left.y; y < right.y; y++)
             for (int x = left.x; x < right.x; x++)
             {
@@ -233,6 +290,8 @@ public final class Angler implements Runnable
                     pntCalibration = new Point(x, y);
                     /* Move the mouse there to inform the user of where the program found that color. */
                     Tools.bot.mouseMove(x, y);
+                    Controller.sendMessage(String.valueOf(x));
+                    Controller.sendMessage(String.valueOf(y));
                     return true;
                 }
             }
@@ -247,7 +306,7 @@ public final class Angler implements Runnable
      */
     private boolean colorIsTooltip(final Color c)
     {
-        return c.getRed() > 200 && c.getGreen() > 200 && c.getBlue() < 50;
+        return c.getRed() <20 && c.getGreen() <20 && c.getBlue() < 20;
     }
 
     public BooleanProperty fishingProperty()

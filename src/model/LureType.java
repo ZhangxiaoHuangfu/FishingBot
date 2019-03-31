@@ -8,6 +8,7 @@ package model;
  */
 public enum LureType
 {
+    FISHING_CAP(Lang.CN_ITEM_FISHING_CAP, 10, "fishing_cap.png"),
     SHINY_BAUBLE(Lang.EN_ITEM_SHINY_BAUBLE, 10, "orb.png"),
     NIGHTCRAWLERS(Lang.EN_ITEM_NIGHTCRAWLERS, 10, "worm.png"),
     AQUADYNAMIC_FISH_LENS(Lang.EN_ITEM_AQUADYNAMIC_FISH_LENS, 10, "spyglass.png"),

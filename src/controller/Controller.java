@@ -92,7 +92,7 @@ public final class Controller
     {
         if (listener != null)
             Platform.runLater(() -> listener.fire(
-                            ZonedDateTime.now().format(DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM))
+                    ZonedDateTime.now().format(DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM)).concat(": ").concat(System.currentTimeMillis()+"")
                                     .concat(": ".concat(message))));
     }
 

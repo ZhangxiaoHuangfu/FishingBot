@@ -42,6 +42,7 @@ public final class Lang
             EN_USE = "/use ",
             EN_LOGOUT = "/logout",
             EN_GRAB_POLE = "/script PickupInventoryItem(16)",
+            EN_ITEM_FISHING_CAP = "Fishing Cap",
             EN_ITEM_SHINY_BAUBLE = "Shiny Bauble",
             EN_ITEM_NIGHTCRAWLERS = "Nightcrawlers",
             EN_ITEM_AQUADYNAMIC_FISH_LENS = "Aquadynamic Fish Lens",
@@ -74,5 +75,16 @@ public final class Lang
             EN_LINK_CONTACT_TEXT = "Contact Author",
             EN_LINK_CONTACT_EMAIL = "kev070892@gmail.com",
             EN_LINK_DONATE_TEXT = "Donate",
-            EN_LINK_DONATE_SITE = "https://paypal.me/KevinTearUl";
+            EN_LINK_DONATE_SITE = "https://paypal.me/KevinTearUl",
+
+
+
+
+           CN_CAST_FISHING = "/cast 钓鱼",
+           CN_ITEM_FISHING_CAP = "饱经风霜的渔帽"
+                    ;
+
+
+
+
 }

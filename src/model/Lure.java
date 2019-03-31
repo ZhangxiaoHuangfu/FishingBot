@@ -42,6 +42,11 @@ public final class Lure
     {
         final int LURE_SLEEP = 7000;
         Controller.sendMessage(Lang.EN_MSG_LURE_APPLY.concat(getType().getName()).concat("."));
+        if (getType().equals(LureType.FISHING_CAP)) {
+            Tools.typeStr(Lang.EN_USE.concat(getType().getName()));
+            applyTS = System.currentTimeMillis();
+            return;
+        }
         Tools.typeStr(Lang.EN_USE.concat(getType().getName()));
         Tools.typeStr(Lang.EN_GRAB_POLE);
         /* Deduct one lure from the user's total quantity. */

@@ -58,7 +58,7 @@ public final class Tools
         final BufferedImage ss = Tools.screenshot();
 
         /* Variables to prevent out of bounds exceptions when looping across the image. */
-        final int RADIUS = 75, SQ_R = RADIUS * RADIUS,
+        final int RADIUS = 100, SQ_R = RADIUS * RADIUS,
                 Y_END = Math.min(ss.getHeight() - 1, centerY + RADIUS),
                 X_END = Math.min(ss.getWidth() - 1, centerX + RADIUS),
                 X_START = Math.max(0, centerX - RADIUS),
@@ -75,12 +75,15 @@ public final class Tools
                 {
                     /* AND with 0xFF will grab only the blue from this pixel. */
                     blueSum += ss.getRGB(x, y) & 0xFF;
+//                    blueSum += ss.getRGB(x, y) & 0xFF00 >> 8;
+//                    blueSum += ss.getRGB(x, y) & 0xFF0000 >> 16;
                     pixelCount++;
                 }
             }
         }
 
         /* Divide by zero protection. */
+//        Controller.sendMessage(((pixelCount > 0) ? (double)blueSum / pixelCount : 0)+"");
         return (pixelCount > 0) ? (double)blueSum / pixelCount : 0;
     }
 
