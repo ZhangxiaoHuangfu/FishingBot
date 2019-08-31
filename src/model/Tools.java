@@ -151,7 +151,7 @@ public final class Tools
     public static void typeStr(final String output)
     {
         /* Delay in-between key press and release. */
-        final long PASTE_DELAY = 25;
+        final long PASTE_DELAY = 100;
         try
         {
             Clipboard cb = Toolkit.getDefaultToolkit().getSystemClipboard();

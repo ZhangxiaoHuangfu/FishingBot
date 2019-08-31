@@ -160,7 +160,7 @@ public final class Angler implements Runnable
     private boolean reelIn()
     {
         final Point mouse = MouseInfo.getPointerInfo().getLocation();
-        final long START_TS = System.currentTimeMillis(), GIVE_UP_TS = 26000;
+        final long START_TS = System.currentTimeMillis(), GIVE_UP_TS = 22000;
         final int CPU_DELAY = 25;
         /* If the user moves his mouse, then we will still have memory of the right coordinates. */
         final int MOUSE_X = mouse.x, MOUSE_Y = mouse.y;
